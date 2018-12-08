@@ -1,7 +1,8 @@
 mod day1;
 mod day2;
+mod day3;
 mod fileutil;
 
 fn main() -> () {
-    day2::run();
+    day3::run();
 }
