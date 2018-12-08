@@ -42,6 +42,13 @@ fn parse_line(line: &String) -> Claim {
     };
 }
 
+fn within(x: i32, y: i32, claim: &Claim) -> bool {
+    claim.origin_x < x &&
+        claim.origin_y < y &&
+        (claim.origin_x + claim.width) >= x &&
+        (claim.origin_y + claim.height) >= y
+}
+
 pub fn run() -> () {
     match fileutil::read_lines("./data/03.txt") {
         Ok(lines) => {
@@ -49,8 +56,22 @@ pub fn run() -> () {
                 .map(|line| parse_line(line))
                 .collect();
 
-            // General idea: do pairwise intersection to generate all possible intersecting claims.
-            // Then, union all pairwise intersections.
+            let mut intersecting_sq = 0;
+            for x in 0..1000 {
+                for y in 0..1000 {
+                    let mut num_claims_containing = 0;
+
+                    for claim in &claims  {
+                        num_claims_containing += if within(x, y, claim) { 1 } else { 0 };
+                        if num_claims_containing > 1 {
+                            intersecting_sq += 1;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            println!("intersecting sq: {}", intersecting_sq);
         }
         Err(e) => panic!(e)
     }
