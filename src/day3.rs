@@ -42,37 +42,12 @@ fn parse_line(line: &String) -> Claim {
     };
 }
 
-fn within(x: i32, y: i32, claim: &Claim) -> bool {
-    claim.origin_x < x &&
-        claim.origin_y < y &&
-        (claim.origin_x + claim.width) >= x &&
-        (claim.origin_y + claim.height) >= y
-}
-
-fn intersects(a: &Claim, b: &Claim) -> bool {
-    let b_left = b.origin_x + 1;
-    let b_top = b.origin_y + 1;
-    let b_right = b.origin_x + b.width;
-    let b_bottom = b.origin_y + b.height;
-
-    within(b_left, b_top, a) ||
-        within(b_right, b_top, a) ||
-        within(b_left, b_bottom, a) ||
-        within(b_right, b_bottom, a)
-}
-
-fn pt1(claims: &Vec<Claim>) -> () {
+fn pt1(grid: &mut [[i32; 1000]; 1000], claims: &Vec<Claim>) -> () {
     let mut intersecting_sq = 0;
-    for x in 0..1000 {
-        for y in 0..1000 {
-            let mut num_claims_containing = 0;
-
-            for claim in claims.iter() {
-                num_claims_containing += if within(x, y, claim) { 1 } else { 0 };
-                if num_claims_containing > 1 {
-                    intersecting_sq += 1;
-                    break;
-                }
+    for y in 0..1000 {
+        for x in 0..1000 {
+            if grid[y][x] == -1 {
+                intersecting_sq += 1;
             }
         }
     }
@@ -80,26 +55,10 @@ fn pt1(claims: &Vec<Claim>) -> () {
     println!("intersecting sq: {}", intersecting_sq);
 }
 
-fn pt2(claims: &Vec<Claim>) -> () {
-    let mut grid: [[i32; 1000]; 1000] = [[0; 1000]; 1000];
-
-    for claim in claims {
-        for x in claim.origin_x..(claim.origin_x + claim.width) {
-            for y in claim.origin_y..(claim.origin_y + claim.height) {
-                let ux = x as usize;
-                let uy = y as usize;
-                if grid[uy][ux] != 0 {
-                    grid[uy][ux] = -1;
-                } else {
-                    grid[uy][ux] = claim.id;
-                }
-            }
-        }
-    }
-
+fn pt2(grid: &mut [[i32; 1000]; 1000], claims: &Vec<Claim>) -> () {
     let claim_intact = |claim: &Claim| {
-        for x in claim.origin_x..(claim.origin_x + claim.width) {
-            for y in claim.origin_y..(claim.origin_y + claim.height) {
+        for y in claim.origin_y..(claim.origin_y + claim.height) {
+            for x in claim.origin_x..(claim.origin_x + claim.width) {
                 let ux = x as usize;
                 let uy = y as usize;
                 if grid[uy][ux] != claim.id {
@@ -116,29 +75,6 @@ fn pt2(claims: &Vec<Claim>) -> () {
             println!("intact claim: {:?}", claim);
         }
     }
-
-}
-
-#[cfg(test)]
-mod tests {
-    use day3::*;
-
-    #[test]
-    fn intersect_test() {
-        assert!(
-            intersects(
-                &Claim { id: 1, origin_x: 0, origin_y: 0, width: 5, height: 5 },
-                &Claim { id: 2, origin_x: 1, origin_y: 1, width: 6, height: 6 }
-            )
-        );
-
-        assert!(
-            !intersects(
-                &Claim { id: 1, origin_x: 0, origin_y: 0, width: 3, height: 3 },
-                &Claim { id: 2, origin_x: 3, origin_y: 3, width: 3, height: 3 }
-            )
-        );
-    }
 }
 
 pub fn run() -> () {
@@ -148,8 +84,24 @@ pub fn run() -> () {
                 .map(|line| parse_line(line))
                 .collect();
 
-//            pt1(&claims);
-            pt2(&claims);
+            let mut grid: [[i32; 1000]; 1000] = [[0; 1000]; 1000];
+
+            for claim in &claims {
+                for x in claim.origin_x..(claim.origin_x + claim.width) {
+                    for y in claim.origin_y..(claim.origin_y + claim.height) {
+                        let ux = x as usize;
+                        let uy = y as usize;
+                        if grid[uy][ux] != 0 {
+                            grid[uy][ux] = -1;
+                        } else {
+                            grid[uy][ux] = claim.id;
+                        }
+                    }
+                }
+            }
+
+            pt1(&mut grid,&claims);
+            pt2(&mut grid,&claims);
         }
         Err(e) => panic!(e)
     }
