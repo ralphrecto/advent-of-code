@@ -49,6 +49,76 @@ fn within(x: i32, y: i32, claim: &Claim) -> bool {
         (claim.origin_y + claim.height) >= y
 }
 
+fn intersects(a: &Claim, b: &Claim) -> bool {
+    let b_left = b.origin_x + 1;
+    let b_top = b.origin_y + 1;
+    let b_right = b.origin_x + b.width;
+    let b_bottom = b.origin_y + b.height;
+
+    within(b_left, b_top, a) ||
+        within(b_right, b_top, a) ||
+        within(b_left, b_bottom, a) ||
+        within(b_right, b_bottom, a)
+}
+
+fn pt1(claims: &Vec<Claim>) -> () {
+    let mut intersecting_sq = 0;
+    for x in 0..1000 {
+        for y in 0..1000 {
+            let mut num_claims_containing = 0;
+
+            for claim in claims.iter() {
+                num_claims_containing += if within(x, y, claim) { 1 } else { 0 };
+                if num_claims_containing > 1 {
+                    intersecting_sq += 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    println!("intersecting sq: {}", intersecting_sq);
+}
+
+fn pt2(claims: &Vec<Claim>) -> () {
+    for a in claims {
+        let mut clear = true;
+        for b in claims {
+            if a.id != b.id && intersects(a, b) {
+                println!("{:?}, {:?}", a, b);
+                clear = false;
+                break;
+            }
+        }
+
+        if clear {
+//            println!("{:?}", a);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use day3::*;
+
+    #[test]
+    fn intersect_test() {
+        assert!(
+            intersects(
+                &Claim { id: 1, origin_x: 0, origin_y: 0, width: 5, height: 5 },
+                &Claim { id: 2, origin_x: 1, origin_y: 1, width: 6, height: 6 }
+            )
+        );
+
+        assert!(
+            !intersects(
+                &Claim { id: 1, origin_x: 0, origin_y: 0, width: 3, height: 3 },
+                &Claim { id: 2, origin_x: 3, origin_y: 3, width: 3, height: 3 }
+            )
+        );
+    }
+}
+
 pub fn run() -> () {
     match fileutil::read_lines("./data/03.txt") {
         Ok(lines) => {
@@ -56,22 +126,8 @@ pub fn run() -> () {
                 .map(|line| parse_line(line))
                 .collect();
 
-            let mut intersecting_sq = 0;
-            for x in 0..1000 {
-                for y in 0..1000 {
-                    let mut num_claims_containing = 0;
-
-                    for claim in &claims  {
-                        num_claims_containing += if within(x, y, claim) { 1 } else { 0 };
-                        if num_claims_containing > 1 {
-                            intersecting_sq += 1;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            println!("intersecting sq: {}", intersecting_sq);
+//            pt1(&claims);
+            pt2(&claims);
         }
         Err(e) => panic!(e)
     }
