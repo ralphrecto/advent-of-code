@@ -4,6 +4,7 @@ use std::collections::HashMap;
 pub fn run() -> () {
     match fileutil::read_lines("./data/02.txt") {
         Ok(lines) => {
+            // pt1.
             let mut twice: u32 = 0;
             let mut thrice: u32 = 0;
 
@@ -25,6 +26,40 @@ pub fn run() -> () {
             }
 
             println!("checksum: {}", twice * thrice);
+
+            // pt2.
+            for i in 0..lines.len() {
+                for j in (i+1)..lines.len() {
+                    let istr = &lines[i];
+                    let jstr = &lines[j];
+
+                    let mut diff_count = 0;
+                    let mut last_diff_index = None;
+                    for (idx, (ic, jc)) in istr.chars().zip(jstr.chars()).enumerate() {
+                        if ic != jc {
+                            diff_count += 1;
+                            if diff_count > 1 {
+                                break;
+                            }
+
+                            last_diff_index = Some(idx);
+                        }
+                    }
+
+                    match (last_diff_index, diff_count) {
+                        (Some(idx), 1) => {
+                            let s: String = istr.chars()
+                                .enumerate()
+                                .filter(|&(c_idx, c)| idx != c_idx)
+                                .map(|(_, c)| c)
+                                .collect();
+
+                            println!("pt2: {}", s);
+                        }
+                        _ => {}
+                    }
+                }
+            }
         }
         Err(e) => println!("{}", e)
     }

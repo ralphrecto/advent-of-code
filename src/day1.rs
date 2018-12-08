@@ -29,7 +29,7 @@ fn pt2(lines: &Vec<String>) -> () {
             }
         }
 
-        if (triggered) {
+        if triggered {
             break;
         }
     }
