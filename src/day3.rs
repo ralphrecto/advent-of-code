@@ -81,20 +81,42 @@ fn pt1(claims: &Vec<Claim>) -> () {
 }
 
 fn pt2(claims: &Vec<Claim>) -> () {
-    for a in claims {
-        let mut clear = true;
-        for b in claims {
-            if a.id != b.id && intersects(a, b) {
-                println!("{:?}, {:?}", a, b);
-                clear = false;
-                break;
+    let mut grid: [[i32; 1000]; 1000] = [[0; 1000]; 1000];
+
+    for claim in claims {
+        for x in claim.origin_x..(claim.origin_x + claim.width) {
+            for y in claim.origin_y..(claim.origin_y + claim.height) {
+                let ux = x as usize;
+                let uy = y as usize;
+                if grid[uy][ux] != 0 {
+                    grid[uy][ux] = -1;
+                } else {
+                    grid[uy][ux] = claim.id;
+                }
+            }
+        }
+    }
+
+    let claim_intact = |claim: &Claim| {
+        for x in claim.origin_x..(claim.origin_x + claim.width) {
+            for y in claim.origin_y..(claim.origin_y + claim.height) {
+                let ux = x as usize;
+                let uy = y as usize;
+                if grid[uy][ux] != claim.id {
+                    return false;
+                }
             }
         }
 
-        if clear {
-//            println!("{:?}", a);
+        return true;
+    };
+
+    for claim in claims {
+        if claim_intact(claim) {
+            println!("intact claim: {:?}", claim);
         }
     }
+
 }
 
 #[cfg(test)]
