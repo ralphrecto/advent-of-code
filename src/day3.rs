@@ -1,5 +1,4 @@
 use fileutil;
-use std::collections::HashMap;
 
 #[derive(Debug)]
 struct Claim {
@@ -87,8 +86,8 @@ pub fn run() -> () {
             let mut grid: [[i32; 1000]; 1000] = [[0; 1000]; 1000];
 
             for claim in &claims {
-                for x in claim.origin_x..(claim.origin_x + claim.width) {
-                    for y in claim.origin_y..(claim.origin_y + claim.height) {
+                for y in claim.origin_y..(claim.origin_y + claim.height) {
+                    for x in claim.origin_x..(claim.origin_x + claim.width) {
                         let ux = x as usize;
                         let uy = y as usize;
                         if grid[uy][ux] != 0 {
