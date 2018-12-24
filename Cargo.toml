@@ -4,4 +4,3 @@ version = "0.1.0"
 authors = ["Ralph Recto <recto.ralph@gmail.com>"]
 
 [dependencies]
-chrono = "0.4.6"
