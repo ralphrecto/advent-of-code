@@ -6,5 +6,5 @@ mod day5;
 mod fileutil;
 
 fn main() -> () {
-    day5::run();
+    day5::timed();
 }
