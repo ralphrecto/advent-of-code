@@ -1,5 +1,5 @@
 use fileutil;
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, BTreeSet};
 
 #[derive(Clone, Copy)]
 struct Edge {
@@ -10,57 +10,41 @@ struct Edge {
 // Implementation of Kahn's algorithm for computing a topological sort.
 fn kahns_algorithm(edges: &Vec<Edge>) -> Vec<char> {
     // (node -> list of neighbors with incoming edges into node)
-    let mut adj: HashMap<char, Vec<char>> = HashMap::new();
+    let mut adj: HashMap<char, HashSet<char>> = HashMap::new();
 
     for Edge { src, dest } in edges.iter() {
-        adj.entry(*src).or_insert(Vec::new());
-        adj.entry(*dest).or_insert(Vec::new()).push(*src);
+        adj.entry(*src).or_insert(HashSet::new());
+        adj.entry(*dest).or_insert(HashSet::new()).insert(*src);
     }
 
     let mut topolist: Vec<char> = Vec::with_capacity(adj.len());
-    let mut srcset: HashSet<char> = adj.iter()
+    let mut candset: BTreeSet<char> = adj.iter()
         .filter(|(dest, srclist)| srclist.is_empty())
         .map(|(dest, _)| *dest)
         .collect();
 
-//    L ← Empty list that will contain the sorted elements
-//    S ← Set of all nodes with no incoming edge
-//    while S is non-empty do
-    //    remove a node n from S
-    //    add n to tail of L
-    //    for each node m with an edge e from n to m do
-        //    remove edge e from the graph
-        //    if m has no other incoming edges then
-            //    insert m into S
-//    if graph has edges then
-//    return error   (graph has at least one cycle)
-    //    else
-//    return L   (a topologically sorted order)
-
     loop {
-        println!("adj: {:?}", &adj);
-        println!("srcset: {:?}", &srcset);
-        if srcset.is_empty() {
+        if candset.is_empty() {
             break;
         }
 
-        let c: char = *srcset.iter().next().unwrap();
-        srcset.remove(&c);
+        let c: char = *candset.iter().next().unwrap();
+        candset.remove(&c);
         topolist.push(c);
 
-        // Insert neighbors of c into srcset, if possible.
-        {
-            let c_adj_set: &Vec<char> = adj.get(&c).unwrap();
-
-            for c_neighbor in c_adj_set.iter() {
-                if adj.get(c_neighbor).unwrap().is_empty() {
-                    srcset.insert(*c_neighbor);
-                }
-            }
+        for (_, srcset) in adj.iter_mut() {
+            srcset.remove(&c);
         }
 
-        // Clear out the edges going into c.
-        adj.get_mut(&c).unwrap().clear();
+        for (dest, srcset) in adj.iter() {
+            if srcset.is_empty() &&
+                c != *dest &&
+                !candset.contains(dest) &&
+                !topolist.contains(dest)
+            {
+                candset.insert(*dest);
+            }
+        }
     }
 
     return topolist;
@@ -75,7 +59,7 @@ pub fn run() -> () {
                     Edge { src: charvec[5], dest: charvec[36] }
                 }).collect();
 
-            println!("{:?}", kahns_algorithm(&edges));
+            println!("{:?}", kahns_algorithm(&edges).iter().collect::<String>());
         }
         Err(e) => {
             panic!(e);
