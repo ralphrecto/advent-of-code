@@ -40,6 +40,7 @@ fn closest(c: Coord, cand_coords: &Vec<Coord>) -> Option<Coord> {
 pub fn run() -> () {
     match fileutil::read_lines("./data/06.txt") {
         Ok(lines) => {
+            // Part 1.
             let mut xmin = i32::MAX;
             let mut xmax = i32::MIN;
             let mut ymin = i32::MAX;
@@ -86,7 +87,27 @@ pub fn run() -> () {
                 }).max()
                 .unwrap();
 
+            println!("part 1");
             println!("max finite area: {}", max);
+
+            // Part 2.
+            println!("part 2");
+
+            let mut region_size = 0;
+            for x in xmin..=xmax {
+                for y in ymin..=ymax {
+                    let xycoord = Coord { x, y };
+                    let mut totaldist : i32 = coords.iter()
+                        .map(|coord| xycoord.dist(coord))
+                        .sum();
+
+                    if totaldist < 10000 {
+                        region_size += 1;
+                    }
+                }
+            }
+
+            println!("region size: {}", region_size);
         }
         Err(e) => {
             panic!(e);
