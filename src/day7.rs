@@ -9,7 +9,8 @@ struct Edge {
 }
 
 // Implementation of Kahn's algorithm for computing a topological sort.
-fn kahns_algorithm(adj: &mut HashMap<char, HashSet<char>>) -> Vec<char> {
+fn kahns_algorithm(adj_orig: &HashMap<char, HashSet<char>>) -> Vec<char> {
+    let mut adj = adj_orig.clone();
     let mut topolist: Vec<char> = Vec::with_capacity(adj.len());
     let mut candset: BTreeSet<char> = adj.iter()
         .filter(|(dest, srclist)| srclist.is_empty())
@@ -43,19 +44,29 @@ fn kahns_algorithm(adj: &mut HashMap<char, HashSet<char>>) -> Vec<char> {
     return topolist;
 }
 
-fn assign(workers: &mut Vec<Option<(char, u32)>>, task: char) -> bool {
+fn assign(workers: &mut Vec<Option<(char, u32)>>, task: char) -> () {
+    let is_assigned = workers.iter()
+        .any(|worker| {
+            match *worker {
+                Some((worker_task, _)) => worker_task == task,
+                None => false
+            }
+        });
+
+    if is_assigned {
+        return;
+    }
+
     for worker in workers.iter_mut() {
         match *worker {
             Some(_) => { }
             None => {
                 let work = compute_work(task);
                 *worker = Some((task, work));
-                return true;
+                return;
             }
         }
     }
-
-    false
 }
 
 fn simulate_work(workers: &mut Vec<Option<(char, u32)>>) -> (HashSet<char>, u32) {
@@ -98,28 +109,17 @@ fn compute_work(task: char) -> u32 {
 }
 
 fn compute_total_work(
-    adj: &mut HashMap<char, HashSet<char>>,
+    adj: &HashMap<char, HashSet<char>>,
     topolist: &Vec<char>,
     num_workers: usize) -> u32 {
     // Each index represents a worker, each value represents ticks left on current work.
     let mut workers: Vec<Option<(char, u32)>> = Vec::with_capacity(num_workers);
     workers.resize(num_workers, Option::None);
-    let mut cur_idx = 0;
     let mut total_ticks = 0;
     let mut complete: HashSet<char> = HashSet::new();
 
     let mut ticks = 0;
     loop {
-//        ticks += 1;
-//        if ticks > 30 {
-//            break;
-//        }
-
-        println!("============");
-        println!("complete: {:?}", &complete);
-        println!("workers: {:?}", &workers);
-        println!("total work: {:?}", total_ticks);
-        println!("============");
         if complete.len() == topolist.len() {
             break;
         }
@@ -130,17 +130,11 @@ fn compute_total_work(
         }
         total_ticks += ticks_adv;
 
-        for task in &topolist[cur_idx..] {
+        for task in topolist {
             match adj.get(task) {
                 Some(deps) => {
-                    if deps.difference(&complete).count() == 0 {
-                        if !assign(&mut workers, *task) {
-                            break;
-                        } else {
-                            cur_idx += 1;
-                        }
-                    } else {
-                        break;
+                    if !complete.contains(task) && deps.difference(&complete).count() == 0 {
+                        assign(&mut workers, *task);
                     }
                 }
                 None => {
@@ -169,12 +163,12 @@ pub fn run() -> () {
                 adj.entry(*dest).or_insert(HashSet::new()).insert(*src);
             }
 
-            let topolist: Vec<char> = kahns_algorithm(&mut adj);
+            let topolist: Vec<char> = kahns_algorithm(&adj);
             println!("part 1.");
             println!("topological sort: {:?}", topolist.iter().collect::<String>());
 
             println!("part 2.");
-            println!("total work: {}", compute_total_work(&mut adj, &topolist, 5));
+            println!("total work: {}", compute_total_work(&adj, &topolist, 5));
         }
         Err(e) => {
             panic!(e);
