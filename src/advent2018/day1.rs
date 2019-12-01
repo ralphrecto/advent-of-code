@@ -36,7 +36,7 @@ fn pt2(lines: &Vec<String>) -> () {
 }
 
 pub fn run() -> () {
-    match fileutil::read_lines("./2018/data/01.txt") {
+    match fileutil::read_lines("./data/2018/01.txt") {
         Ok(lines) => {
             pt1(&lines);
             pt2(&lines);

@@ -148,7 +148,7 @@ fn compute_total_work(
 }
 
 pub fn run() -> () {
-    match fileutil::read_lines("./2018/data/07.txt") {
+    match fileutil::read_lines("./data/2018/07.txt") {
         Ok(lines) => {
             let edges: Vec<Edge> = lines.iter()
                 .map(|line| {

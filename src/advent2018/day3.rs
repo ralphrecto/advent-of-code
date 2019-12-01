@@ -77,7 +77,7 @@ fn pt2(grid: &mut [[i32; 1000]; 1000], claims: &Vec<Claim>) -> () {
 }
 
 pub fn run() -> () {
-    match fileutil::read_lines("./2018/data/03.txt") {
+    match fileutil::read_lines("./data/2018/03.txt") {
         Ok(lines) => {
             let claims: Vec<Claim> = lines.iter()
                 .map(|line| parse_line(line))

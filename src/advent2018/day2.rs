@@ -2,7 +2,7 @@ use fileutil;
 use std::collections::HashMap;
 
 pub fn run() -> () {
-    match fileutil::read_lines("./2018/data/02.txt") {
+    match fileutil::read_lines("./data/2018/02.txt") {
         Ok(lines) => {
             // pt1.
             let mut twice: u32 = 0;

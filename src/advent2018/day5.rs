@@ -75,7 +75,7 @@ fn part2(orig: &str) -> () {
 }
 
 pub fn run() -> () {
-    match fileutil::read_file("./2018/data/05.txt") {
+    match fileutil::read_file("./data/2018/05.txt") {
         Ok(orig) => {
             part1(&orig);
             part2(&orig);
