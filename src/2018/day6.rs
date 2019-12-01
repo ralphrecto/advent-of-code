@@ -38,7 +38,7 @@ fn closest(c: Coord, cand_coords: &Vec<Coord>) -> Option<Coord> {
 }
 
 pub fn run() -> () {
-    match fileutil::read_lines("./data/06.txt") {
+    match fileutil::read_lines("./2018/data/06.txt") {
         Ok(lines) => {
             // Part 1.
             let mut xmin = i32::MAX;

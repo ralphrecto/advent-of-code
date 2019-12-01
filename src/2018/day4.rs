@@ -114,7 +114,7 @@ fn part2(sleeps_by_id: &HashMap<i32, Vec<(i32, i32)>>) -> () {
 }
 
 pub fn run() -> () {
-    match fileutil::read_lines("./data/04.txt") {
+    match fileutil::read_lines("./2018/data/04.txt") {
         Ok(lines) => {
             let mut chronological_events: Vec<Event> = (&lines).iter()
                 .map(|line| parse_line(&line))
