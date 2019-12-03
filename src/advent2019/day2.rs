@@ -1,13 +1,13 @@
 use fileutil;
 
-fn pt1(line: &str) -> () {
-    let mut ops: Vec<usize> = line.split(',')
+fn grav_assist_prog(prog: &str, noun: usize, verb: usize) -> usize {
+    let mut ops: Vec<usize> = prog.split(',')
         .map(|cmp| cmp.parse::<usize>().unwrap())
         .collect();
 
     // pre-run mutations
-    ops[1] = 12;
-    ops[2] = 2;
+    ops[1] = noun;
+    ops[2] = verb;
 
     let mut current_op_idx = 0;
     let mut current_op = ops[current_op_idx];
@@ -28,14 +28,28 @@ fn pt1(line: &str) -> () {
         current_op = ops[current_op_idx];
     }
 
-    println!("{}", ops[0]);
+    return ops[0];
+}
+
+fn pt2(prog: &str) -> () {
+    for noun in 0..100 {
+        for verb in 0..100 {
+            if grav_assist_prog(prog, noun, verb) == 19690720 {
+                println!("noun: {}, verb: {}", noun, verb);
+                return;
+            }
+        }
+    }
 }
 
 pub fn run() -> () {
     match fileutil::read_lines("./data/2019/02.txt") {
         Ok(lines) => {
             assert!(lines.len() == 1);
-            pt1(&lines[0]);
+            // pt. 1
+            // println!("{}", grav_assist_prog(&lines[0], 12, 2));
+
+            pt2(&lines[0]);
         }
         Err(e) => println!("{}", e)
     }
