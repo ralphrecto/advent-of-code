@@ -7,6 +7,8 @@ struct Point {
     y: i32
 }
 
+const ORIGIN: Point = Point {x: 0, y: 0};
+
 #[derive(Debug, Clone, Copy)]
 struct Segment {
     start: Point,
@@ -80,16 +82,9 @@ fn intersection(a: &Segment, b: &Segment) -> Option<Point> {
     }
 }
 
-fn manhattan_dist(a: Point, b: Point) -> i32 {
-    return (a.x - b.x).abs() + (a.y - b.y).abs();
-}
-
-fn pt1(line1: &str, line2: &str) -> () {
-    let first_line: Vec<Segment> = line_segments(Point{x: 0, y: 0}, line1);
-    let second_line: Vec<Segment> = line_segments(Point{x: 0, y: 0}, line2);
-
+fn intersections(first_line: &Vec<Segment>, second_line: &Vec<Segment>) -> Vec<Point> {
     let origin = Point {x: 0, y: 0};
-    let mut min_dist: i32 = i32::MAX;
+    let mut intersections: Vec<Point> = Vec::new();
     for segment_a in first_line.iter() {
         for segment_b in second_line.iter() {
             match intersection(segment_a, segment_b) {
@@ -99,21 +94,80 @@ fn pt1(line1: &str, line2: &str) -> () {
                         continue;
                     }
 
-                    min_dist = min_dist.min(manhattan_dist(pt, origin));
-                }
+                    intersections.push(pt);
+                },
                 None => ()
             }
         }
     }
 
+    return intersections;
+}
+
+fn manhattan_dist(a: &Point, b: &Point) -> i32 {
+    return (a.x - b.x).abs() + (a.y - b.y).abs();
+}
+
+fn length(s: &Segment) -> i32 {
+    return manhattan_dist(&(*s).start, &(*s).end);
+}
+
+fn contains_point(s: &Segment, p: &Point) -> bool {
+    let x_ok = (s.start.x <= p.x && p.x <= s.end.x) ||
+        (s.end.x <= p.x && p.x <= s.start.x);
+
+    let y_ok = (s.start.y <= p.y && p.y <= s.end.y) ||
+        (s.end.y <= p.y && p.y <= s.start.y);
+
+    return x_ok && y_ok;
+}
+
+fn pt1(first_line: &Vec<Segment>, second_line: &Vec<Segment>) -> () {
+    let mut min_dist: i32 = i32::MAX;
+    for intersection in intersections(first_line, second_line) {
+        min_dist = min_dist.min(manhattan_dist(&intersection, &ORIGIN));
+    }
+
     println!("{}", min_dist);
 }
+
+fn delay(line: &Vec<Segment>, p: &Point) -> i32 {
+    let mut delay_acc: i32 = 0;
+    for segment in line {
+        if contains_point(segment, p) {
+            let truncated = Segment {start: segment.start, end: *p};
+            delay_acc += length(&truncated);
+            return delay_acc;
+        } else {
+            delay_acc += length(segment);
+        }
+    }
+
+    panic!("point {:?} was not in line {:?}", p, line);
+}
+
+fn pt2(first_line: &Vec<Segment>, second_line: &Vec<Segment>) -> () {
+    let mut min_dist: i32 = i32::MAX;
+    for intersection in intersections(first_line, second_line) {
+        let first_delay = delay(first_line, &intersection);
+        let second_delay = delay(second_line, &intersection);
+        min_dist = min_dist.min(first_delay + second_delay);
+    }
+
+    println!("{}", min_dist);
+}
+
 
 pub fn run() -> () {
     match fileutil::read_lines("./data/2019/03.txt") {
         Ok(lines) => {
             assert!(lines.len() == 2);
-            pt1(&lines[0], &lines[1]);
+
+            let first_line: Vec<Segment> = line_segments(Point{x: 0, y: 0}, &lines[0]);
+            let second_line: Vec<Segment> = line_segments(Point{x: 0, y: 0}, &lines[1]);
+            
+            pt1(&first_line, &second_line);
+            pt2(&first_line, &second_line);
         }
         Err(e) => println!("{}", e)
     }
