@@ -3,5 +3,5 @@ mod bits;
 mod advent2019;
 
 fn main() -> () {
-    advent2019::day05::run();
+    advent2019::day06::run();
 }
