@@ -2,7 +2,7 @@ use bits;
 use std::io;
 use std::io::prelude::*;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 enum ParameterMode {
     Position,
     Immediate
@@ -14,16 +14,24 @@ enum Opcode {
     Mult,
     Store,
     Output,
+    JumpIfTrue,
+    JumpIfFalse,
+    LessThan,
+    Equals,
     Halt
 }
 
 impl Opcode {
     fn arity(&self) -> usize {
         return match self {
-            Opcode::Plus => 3,
-            Opcode::Mult => 3,
+            Opcode::Plus |
+            Opcode::Mult |
+            Opcode::LessThan |
+            Opcode::Equals => 3,
+            Opcode::Output |
             Opcode::Store => 1,
-            Opcode::Output => 1,
+            Opcode::JumpIfTrue |
+            Opcode::JumpIfFalse => 2,
             Opcode::Halt => 0
         }
     }
@@ -34,10 +42,13 @@ impl Opcode {
             2 => Opcode::Mult,
             3 => Opcode::Store,
             4 => Opcode::Output,
+            5 => Opcode::JumpIfTrue,
+            6 => Opcode::JumpIfFalse,
+            7 => Opcode::LessThan,
+            8 => Opcode::Equals,
             99 => Opcode::Halt, 
             _ => panic!("unknown opcode {}", instr % 100)
         };
-        // println!("instr {}, opcode {:?}", instr, opcode);
 
         let mut param_modes = Vec::with_capacity(opcode.arity());
         for i in 0..opcode.arity() {
@@ -55,10 +66,14 @@ impl Opcode {
 
     fn mode(&self, mode: ParameterMode, i: usize) -> ParameterMode {
         match self {
-            Opcode::Plus => if i == 3 { ParameterMode::Immediate } else { mode },
-            Opcode::Mult => if i == 3 { ParameterMode::Immediate } else { mode },
-            Opcode::Output => ParameterMode::Immediate,
+            Opcode::Plus |
+            Opcode::Mult |
+            Opcode::LessThan |
+            Opcode::Equals => if i == 3 { ParameterMode::Immediate } else { mode },
             Opcode::Store => ParameterMode::Immediate,
+            Opcode::Output |
+            Opcode::JumpIfTrue |
+            Opcode::JumpIfFalse => mode,
             Opcode::Halt => panic!("halt has 0 arity")
         }
     }
@@ -69,28 +84,25 @@ pub fn run_prog(mem: &mut Vec<i32>) -> () {
     loop {
         let (op, param_modes) = Opcode::parse(mem[prog_count]);
 
+        let mut param_literals: Vec<i32> = Vec::with_capacity(op.arity());
         let mut params: Vec<i32> = Vec::with_capacity(op.arity());
         for i in 0..op.arity() {
             let val = mem[prog_count + i + 1];
             let param = match op.mode(param_modes[i], i + 1) {
-                ParameterMode::Position => {
-                    // println!("val {}, op {:?}, prog_count {}", val, op, prog_count);
-                    mem[val as usize]
-                }
+                ParameterMode::Position => mem[val as usize],
                 ParameterMode::Immediate => val
             };
 
+            param_literals.push(val);
             params.push(param);
         }
 
-        // println!("op {:?}, prog_count {}, params {:?}", op, prog_count, params);
+        let mut mutated_prog_count = false;
         match op {
             Opcode::Plus => {
-                // println!("writing {} to {}", params[0] + params[1], params[2]);
                 mem[params[2] as usize] = params[0] + params[1];
             },
             Opcode::Mult => {
-                // println!("writing {} to {}", params[0] * params[1], params[2]);
                 mem[params[2] as usize] = params[0] * params[1];
             },
             Opcode::Store => {
@@ -100,20 +112,37 @@ pub fn run_prog(mem: &mut Vec<i32>) -> () {
                 let mut input = String::new();
                 io::stdin().read_line(&mut input);
 
-                let input_val: i32 = input.trim().parse().unwrap(); 
-
-                // println!("writing {} to {}", input_val, params[0]);
-                mem[params[0] as usize] = input_val;
+                mem[params[0] as usize] = input.trim().parse().unwrap();
             },
             Opcode::Output => {
-                println!("{}", mem[params[0] as usize]);
-            }
+                println!("{}", params[0]);
+            },
+            Opcode::JumpIfTrue => {
+                if params[0] != 0 {
+                    prog_count = params[1] as usize;
+                    mutated_prog_count = true;
+                }
+            },
+            Opcode::JumpIfFalse => {
+                if params[0] == 0 {
+                    prog_count = params[1] as usize;
+                    mutated_prog_count = true;
+                }
+            },
+            Opcode::LessThan => {
+                mem[params[2] as usize] = if params[0] < params[1] { 1 } else { 0 };
+            },
+            Opcode::Equals => {
+                mem[params[2] as usize] = if params[0] == params[1] { 1 } else { 0 };
+            },
             Opcode::Halt => {
                 break
             }
         }
 
-        prog_count += op.arity() + 1;
+        if !mutated_prog_count {
+            prog_count += op.arity() + 1;
+        }
     }
 }
 
