@@ -1,9 +1,9 @@
 use fileutil;
 use advent2019::intcode;
 
-fn grav_assist_prog(prog: &str, noun: usize, verb: usize) -> usize {
-    let mut ops: Vec<usize> = prog.split(',')
-        .map(|cmp| cmp.parse::<usize>().unwrap())
+fn grav_assist_prog(prog: &str, noun: i32, verb: i32) -> i32 {
+    let mut ops: Vec<i32> = prog.split(',')
+        .map(|cmp| cmp.parse::<i32>().unwrap())
         .collect();
 
     // pre-run mutations

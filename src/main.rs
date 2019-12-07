@@ -1,4 +1,5 @@
 mod fileutil;
+mod bits;
 mod advent2019;
 
 fn main() -> () {
