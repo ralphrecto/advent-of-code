@@ -10,6 +10,11 @@ pub fn run() -> () {
         let d6 = i % 10;
         
         let monotone = d1 <= d2 && d2 <= d3 && d3 <= d4 && d4 <= d5 && d5 <= d6;
+
+        if !monotone {
+            continue;
+        }
+
         let adjacent_ok = (d1 == d2 && d2 != d3) ||
             (d2 == d3 && d1 != d2 && d3 != d4) ||
             (d3 == d4 && d2 != d3 && d4 != d5) ||
