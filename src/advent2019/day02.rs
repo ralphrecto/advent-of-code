@@ -2,16 +2,14 @@ use fileutil;
 use advent2019::intcode;
 
 fn grav_assist_prog(prog: &str, noun: i32, verb: i32) -> i32 {
-    let mut ops: Vec<i32> = prog.split(',')
-        .map(|cmp| cmp.parse::<i32>().unwrap())
-        .collect();
+    let mut mem = intcode::parse_prog(prog);
 
     // pre-run mutations
-    ops[1] = noun;
-    ops[2] = verb;
+    mem[1] = noun;
+    mem[2] = verb;
 
-    intcode::run_prog(&mut ops);
-    return ops[0];
+    intcode::run_prog(&mut mem);
+    return mem[0];
 }
 
 fn pt2(prog: &str) -> () {
