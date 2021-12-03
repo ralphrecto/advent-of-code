@@ -1,7 +1,8 @@
 mod fileutil;
 mod bits;
 mod advent2019;
+mod advent2021;
 
 fn main() -> () {
-    advent2019::day06::run();
+    advent2021::day01::run();
 }
