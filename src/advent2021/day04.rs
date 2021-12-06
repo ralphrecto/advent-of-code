@@ -1,11 +1,16 @@
-use std::iter::Enumerate;
-
 use fileutil;
 
 const BOARD_EDGE_SIZE: usize = 5;
 
 #[derive(Debug)]
 struct Board(Vec<Vec<i32>>);
+
+enum Mode {
+    // Run bingo until the first board wins
+    FirstWin,
+    // Run bingo until the last board wins
+    LastWin
+}
 
 impl Board {
     const UNUSED: i32 = -2;
@@ -121,26 +126,57 @@ fn parse_input(filename: &str) -> Input {
 }
 
 
-fn part1(input: &mut Input) {
-    'outermost: for number in &input.numbers {
-        for board in &mut input.boards {
+fn run_bingo(input: &mut Input, mode: Mode) {
+    let mut num_boards_left = input.boards.len() as i32;
+
+    'numberloop: for number in &input.numbers {
+        println!("number {}", number);
+        println!("boards left {}", num_boards_left);
+
+        let mut num_bingo = 0;
+        for board in input.boards.iter_mut() {
+            if board.check_bingo() {
+                num_bingo += 1;
+                continue;
+            }
+
             let (num_rows, num_cols ) = board.dimensions();
 
-            for i in 0..num_rows {
+            'boardloop: for i in 0..num_rows {
                 for j in 0..num_cols {
                     if board.mark_if_match(i, j, *number) && board.check_bingo() {
-                        let unmarked_sum: i32 = board.get_unmarked().iter().sum();
-                        println!("{}", unmarked_sum * (*number));
+                        match mode {
+                            Mode::FirstWin => {
+                                let unmarked_sum: i32 = board.get_unmarked().iter().sum();
+                                println!("{}", unmarked_sum * (*number));
 
-                        break 'outermost;
+                                break 'numberloop;
+                            },
+                            Mode::LastWin => {
+                                num_boards_left -= 1; 
+
+                                if num_boards_left == 0 {
+                                    let unmarked_sum: i32 = board.get_unmarked().iter().sum();
+                                    println!("{}", unmarked_sum * (*number));
+
+                                    break 'numberloop;
+                                } else {
+                                    break 'boardloop;
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+
+        println!("bingos {}", num_bingo);
+        println!("-------")
     }
 }
 
 pub fn run() {
     let mut input = parse_input("data/2021/04.txt");
-    part1(&mut input);
+    // run_bingo(&mut input, Mode::FirstWin);
+    run_bingo(&mut input, Mode::LastWin);
 }
