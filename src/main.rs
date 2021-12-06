@@ -4,5 +4,5 @@ mod advent2019;
 mod advent2021;
 
 fn main() -> () {
-    advent2021::day04::run();
+    advent2021::day05::run();
 }
