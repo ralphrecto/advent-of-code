@@ -65,7 +65,7 @@ impl Segment {
     }
 }
 
-pub fn run() {
+fn run_part(vert_or_horiz_only: bool) {
     let lines = fileutil::read_lines("data/2021/05.txt").unwrap();
 
     let segments: Vec<Segment> = lines.into_iter()
@@ -74,13 +74,11 @@ pub fn run() {
 
     let mut points: HashMap<Point, i32> = HashMap::new();
     for segment in segments {
-        if !segment.is_vertical() && !segment.is_horizontal() {
+        if vert_or_horiz_only && !segment.is_vertical() && !segment.is_horizontal() {
             continue;
         }
 
-        // println!("{:?}", segment);
         for point in segment.points() {
-            // println!("{:?}", point);
             let entry = points.entry(point).or_insert(0);
             *entry += 1;
         }
@@ -89,4 +87,8 @@ pub fn run() {
     let ge2_overlaps = points.values().filter(|v| **v >= 2).count();
 
     println!("{}", ge2_overlaps);
+}
+
+pub fn run() {
+    run_part(false);
 }
