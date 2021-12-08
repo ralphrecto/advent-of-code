@@ -6,6 +6,7 @@ version = 3
 name = "advent-of-code"
 version = "0.1.0"
 dependencies = [
+ "literal",
  "petgraph",
 ]
 
@@ -14,6 +15,12 @@ name = "fixedbitset"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "86d4de0081402f5e88cdac65c8dcdcc73118c1a7a465e2a05f0da05843a8ea33"
+
+[[package]]
+name = "literal"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1098cb40d9a755c5c61003c7d4b5fb890d393bc14cc14024b4000b184e6c9669"
 
 [[package]]
 name = "ordermap"

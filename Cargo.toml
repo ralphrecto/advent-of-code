@@ -5,3 +5,4 @@ authors = ["Ralph Recto <recto.ralph@gmail.com>"]
 
 [dependencies]
 petgraph = "0.4.13"
+literal = "0.2"

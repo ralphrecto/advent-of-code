@@ -1,3 +1,6 @@
+extern crate petgraph;
+extern crate literal;
+
 mod fileutil;
 mod bits;
 mod advent2019;

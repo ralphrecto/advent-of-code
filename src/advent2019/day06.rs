@@ -1,12 +1,10 @@
-extern crate petgraph;
-
 use fileutil;
 use std::collections::{HashMap, HashSet, BinaryHeap};
 use std::iter::Map;
 use std::str::Split;
-use self::petgraph::{Graph, Undirected};
-use self::petgraph::graph::NodeIndex;
-use self::petgraph::algo::dijkstra;
+use petgraph::{Graph, Undirected};
+use petgraph::graph::NodeIndex;
+use petgraph::algo::dijkstra;
 
 fn transitive_orbits(object: &str, orbit_map: &HashMap<&str, HashSet<&str>>) -> u32 {
     match orbit_map.get(object) {
