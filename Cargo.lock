@@ -7,6 +7,7 @@ name = "advent-of-code"
 version = "0.1.0"
 dependencies = [
  "etcommon-bigint",
+ "itertools",
  "literal",
  "petgraph",
 ]
@@ -65,6 +66,12 @@ name = "fuchsia-cprng"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a06f77d526c1a601b7c4cdd98f54b5eaabffc14d5f2f0296febdc7f357c6d3ba"
+
+[[package]]
+name = "itertools"
+version = "0.4.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c4a9b56eb56058f43dc66e58f40a214b2ccbc9f3df51861b63d51dec7b65bc3f"
 
 [[package]]
 name = "lazy_static"

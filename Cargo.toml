@@ -7,3 +7,4 @@ authors = ["Ralph Recto <recto.ralph@gmail.com>"]
 petgraph = "0.4.13"
 literal = "0.2"
 etcommon-bigint = "0.2"
+itertools = "0.4"
