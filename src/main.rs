@@ -9,5 +9,5 @@ mod advent2019;
 mod advent2021;
 
 fn main() -> () {
-    advent2021::day11::run();
+    advent2021::day12::run();
 }
